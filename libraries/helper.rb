@@ -8,18 +8,19 @@ module Pdns
     #
     # @return [TrueClass, FalseClass]
     def schema_exists?(connection_info, database)
-      require 'mysql'
+      require 'mysql2'
+      db = mysql_connection(connection_info, database)
+      db.query('show tables').any?
+    end
 
-      db = ::Mysql.new(
-        connection_info[:host],
-        connection_info[:username],
-        connection_info[:password],
-        nil,
-        connection_info[:port] || 3306,
-        connection_info[:socket] || nil
-      )
-      db.select_db(database)
-      db.list_tables.count != 0
+    def mysql_connection(mysql_connection_info, database = nil)
+      require 'mysql2'
+      Mysql2::Client.new(host: mysql_connection_info[:host],
+                         port: mysql_connection_info[:port] || 3306,
+                         username: mysql_connection_info[:username],
+                         password: mysql_connection_info[:password],
+                         database: database,
+                         socket: mysql_connection_info[:socket] || nil)
     end
   end
 end

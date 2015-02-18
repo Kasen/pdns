@@ -9,7 +9,7 @@ CREATE TABLE domains (
   PRIMARY KEY (id)
 ) Engine=InnoDB;
 
-CREATE UNIQUE INDEX name_index ON domains(name);
+CREATE UNIQUE INDEX name_index ON domains (name);
 
 
 CREATE TABLE records (

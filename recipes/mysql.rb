@@ -1,5 +1,4 @@
 include_recipe 'chef-sugar'
-include_recipe 'database::mysql'
 
 mysql_item = encrypted_data_bag_item(node['pdns']['data_bag'], node['pdns']['data_bag_item'])
 
@@ -8,6 +7,10 @@ mysql_service 'default' do
   server_root_password mysql_item['server_root_password']
   allow_remote_root false
   action :create
+end
+
+mysql2_chef_gem 'default' do
+  action :install
 end
 
 mysql_connection_info = {
@@ -41,10 +44,13 @@ cookbook_file ::File.join(Chef::Config[:file_cache_path], 'mysql_pdns_schema.sql
   mode '0644'
 end
 
-mysql_database mysql_item['db_user'] do
-  connection mysql_connection_info
-  sql { ::File.open(::File.join(Chef::Config[:file_cache_path], 'mysql_pdns_schema.sql')).read }
-  action :query
+# action :query broken now in database cookbook
+execute "Schema_creating" do
+  command "mysql -u root -p#{mysql_item['server_root_password']} #{mysql_item['db_name']} < #{::File.join(Chef::Config[:file_cache_path], 'mysql_pdns_schema.sql')}"
+  user 'root'
+  group 'root'
+  timeout 3600
+  returns 0
   not_if { schema_exists?(mysql_connection_info, mysql_item['db_name']) }
 end
 

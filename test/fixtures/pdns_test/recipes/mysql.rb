@@ -27,10 +27,12 @@ mysql_database mysql_item['db_name'] do
   action :query
 end
 
-mysql_database mysql_item['db_name'] do
-  connection mysql_connection_info
-  sql { ::File.open(::File.join(Chef::Config['file_cache_path'], 'database.sql')).read }
-  action :query
+execute "Test_data_uploading" do
+  command "mysql -u root -p#{mysql_item['server_root_password']} #{mysql_item['db_name']} < #{::File.join(Chef::Config['file_cache_path'], 'database.sql')}"
+  user 'root'
+  group 'root'
+  timeout 3600
+  returns 0
 end
 
 file '/etc/resolv.conf' do
