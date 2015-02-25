@@ -8,7 +8,7 @@ version          '0.3.4'
 
 depends 'sqlite'
 depends 'build-essential'
-depends 'mysql', '~> 5'
+depends 'mysql', '~> 5.6.0'
 depends 'git'
 depends 'resolvconf'
 depends 'database'
